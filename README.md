@@ -39,3 +39,8 @@ You can find the bill of materials, pre-made kit purchasing options, assembly in
 - We also have a Google group set up here: https://groups.google.com/forum/#!forum/stanford-quadrupeds
 
 
+## Vision 
+- pip install depthai-python
+- run pupper_vision in one terminal
+- start another terminal and run pup_move
+- TODO: add full documentation here
