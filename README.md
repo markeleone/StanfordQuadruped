@@ -39,8 +39,64 @@ You can find the bill of materials, pre-made kit purchasing options, assembly in
 - We also have a Google group set up here: https://groups.google.com/forum/#!forum/stanford-quadrupeds
 
 
-## Vision 
-- pip install depthai-python
-- run pupper_vision in one terminal
-- start another terminal and run pup_move
-- TODO: add full documentation here
+# Vision 
+The vision stack is currently in initial stages of development. We are using an OAKD-Lite (Fixed Focus) to give Pupper eyes, complemented by DepthAI's python software package to run lean computer vision models for object detection and tracking. There are many opportunities to improve Pupper's vision stack, and here's how to start!
+
+## Winter 2023 Final Project
+During the Winter 2023 offering of CS199P, one team (Mark Leone and Ryan Dwyer) started the initial work for giving pupper a set of eyes (aka PupPerception). During the Winter 2023 quarter we:
+- Initially wanted to have Pupper chase a ball. TinyYolo (which has ball as a class) drew too much power, and MobileNet was able to run onboard, so the task was changed to Pupper chasing a human.
+- Debugged OAKD hardware issues (large power draw of OAKD-Lite while running models causes brownout, fixed this by powering RasPi and pupper actuators with separate power supplies)
+- Received data from MobileNet using pupper_vision_2.py by identifying a person and taking the center of the bounding box around that person and writing it to a text file
+- Used that CV data to autonomously command Pupper by running a PD control loop in pup_move.py that yaws pupper so that the center of Pupper's field of view is aligned with the center of the bounding box around the human
+- By running pupper_vision_2.py and pup_move.py simultaneously in 2 terminals, Pupper can autonomously orient itself toward a person!
+
+We created the directions below so that you can enable autonomy on your own Pupper using the OAKD-Lite!
+
+## Install requirements
+You need to download several software packages to run Pupper's computer vision stack properly. Each of them are described below. 
+
+### StanfordQuadruped Repo
+git clone this repo, and use "git checkout vision" to make sure you are cloned into this branch of the repository. 
+
+### depthai-python
+depthai-python contains the models, example code, and CV dependencies to process the data from the OAKD-Lite
+- Follow the instructions on the depthai-python github (https://github.com/luxonis/depthai-python) to download depthai-python
+- For your first time using DepthAI on any machine, run "install_requirements.py" within depthai-python/examples to get all dependencies
+- Try running examples/ObjectTracking/object_tracker.py on your machine as a test to make sure all dependencies are met
+
+### X11 forwarding -- IMPORTANT --
+One problem you run into when running depthai-python code on Pupper's RasPi is that the RasPi does not have a monitor, and the code is designed to display the bounding boxes and CV data in real time on a monitor. To prevent from issues associated with this, you must enable X11 forwarding before SSHing into the RasPi onboard Pupper. This will display the real time Pupper vision on your machine's monitor rather than trying to display it on the RasPi. First, you must download an X11 forwarding program.
+
+Mac: 
+- Download XQuartz https://www.xquartz.org/
+- Run XQuartz every time before SSHing into the RasPi (it may run without even popping up on your screen)
+- SSH as normal but add "-X" to the end of your SSH command. For example: ssh pi@raspberrypi.local -X
+
+Windows:
+- Download XMing
+- Run XMing very time before SSHing into the RasPi (it may run without even popping up on your screen)
+- SSH as normal (with Putty https://www.putty.org/) but in Putty, click on the plus sign to the left of "SSH" in the left hand pane, then click "X11" and check the box labeled "Enable X11 Forwarding". You can save these settings in Putty.
+
+## Python Version
+Always run your commands on the RasPi with "python3" rather than "python" since DepthAI code is not compatible with Python 2.7, which is the default on the Pi.
+
+## Hardware troubleshooting
+- Use a USB3-USBC cable (the one with a blue inner piece) to connect the RasPi and the OAKD-Lite. Make sure this is plugged into one of the USB3 (blue inner piece) ports on the RasPi
+- Unplug the jumper cables that power the RasPi from the onboard PCB. You don't want to power the RasPi from onboard and offboard power simultaneously
+- Use an external USB-C cable to power the RasPi. This plugs into the top of Pupper
+
+## Software troubleshooting
+- Make sure to follow directions in the X11 forwarding section above. This is the root of most problems
+
+## Current Work
+Mark:
+- Playing with a pupper depth control loop so that Pupper can follow a person accurately (hopefully done before ICRA)
+- Using real multiprocessing rather than writing to .txt file for running vision and control loops separately
+
+Spring 2023 Final Projects:
+- Project 1: Obstacle avoidance and QR codes
+- Project 2: Combining pupper vision and LLMs
+- Project 3: Making pupper play soccer
+
+## Help 
+If you run into any problems, would like to collaborate, or have any questions, please email me at mleone [at] stanford [dot] edu
